@@ -11,7 +11,11 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// Puts the info in the header above into an array.
+$data = get_plugin_data( UCF_NEWS__PLUGIN_FILE, false, false );
+
 define( 'UCF_NEWS__PLUGIN_FILE', __FILE__ );
+define( 'UCF_NEWS__PLUGIN_VERSION', $data['Version'] );
 
 require_once 'includes/ucf-news-config.php';
 require_once 'includes/ucf-news-feed.php';
@@ -42,6 +46,8 @@ if ( ! function_exists( 'ucf_news_deactivate' ) ) {
 }
 
 add_action( 'plugins_loaded', function() {
+
+	add_action( 'init', array( 'UCF_News_Config', 'version_check' ), 9 );
 
 	add_action( 'init', array( 'UCF_News_Shortcode', 'register_shortcode' ) );
 	add_action( 'admin_menu', array( 'UCF_News_Config', 'add_options_page' ) );

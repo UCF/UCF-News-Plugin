@@ -21,9 +21,43 @@ if ( ! class_exists( 'UCF_News_Config' ) ) {
 				'ucf_news_http_timeout'   => 5
 			);
 
+		/**
+		 * Checks the installed version against
+		 * the version stored in a site_option
+		 */
+		public static function version_check() {
+			// Get current version in options
+			$current_version = get_option( 'ucf_news_version' );
+
+			if ( $current_version === false ) {
+				add_option( 'ucf_news_version', UCF_NEWS__PLUGIN_VERSION );
+				self::ensure_option_defaults();
+				return;
+			}
+
+			if ( version_compare( $current_version, UCF_NEWS__PLUGIN_VERSION, '<' ) ) {
+				self::ensure_option_defaults();
+				update_option( 'ucf_news_version', UCF_NEWS__PLUGIN_VERSION );
+			}
+		}
+
+		private static function ensure_option_defaults() {
+			$options = self::get_default_plugin_options();
+
+			foreach( $options as $name => $value ) {
+				$current_value = get_option( $name );
+
+				if ( $current_value === false ) {
+					add_option( $name, $value );
+				}
+			}
+		}
+
 		public static function add_options() {
 			$defaults = self::$default_plugin_options;
+			$current_version = get_option( 'ucf_news_version' );
 
+			add_option( 'ucf_news_version', $current_version );
 			add_option( 'ucf_news_feed_url', $defaults['ucf_news_feed_url'] );
 			add_option( 'ucf_news_include_css', $defaults['ucf_news_include_css'] );
 			add_option( 'ucf_news_fallback_image', $defaults['ucf_news_fallback_image'] );
