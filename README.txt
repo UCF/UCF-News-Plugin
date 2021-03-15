@@ -21,6 +21,16 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 
 == Changelog ==
+= 2.3.1 =
+Enhancements:
+* Added the WordPress CSS class 'large-text' to both feed URL inputs so the whole feed URL is visible.
+* Hid the Fallback Image preview img tag when there is no URL instead of showing a broken image tag.
+* Updated the <img> tag: added alt text, removed the hard coded 'width' / 'height' and set 'max-width' and 'max-height' to 150px. This keeps the image from distoring in case the user selects a non square image and makes the image preview a little larger. 
+* Added the built in WordPress button CSS classes 'btn' and 'btn-primary' to the Upload link to make it a button.
+* Changed the 'Upload' text to 'Add Image' when no fallback image is selected. It will automatically change to 'Change Image' when a fallback image is selected.
+* Changed the 'Upload Image' text in the Media Library pop-up to 'Select Image'. It's more inline with the final user action.
+* Added text for the user when no fallback image has been selected. Before the broken img tag could be cosntrued as an image being selected but failing to load. This message will automatically hide on adding/selecting an image.
+* Added a 'Remove Image' button that will hide the preview img tag, set the ucf_news_fallback_image hidden field to '', display the no fallback image text, hide the 'Remove Image' button and change the 'Change Image' button back to say 'Add Image'.
 
 = 2.3.0 =
 Enhancements:
