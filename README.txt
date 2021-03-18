@@ -2,7 +2,7 @@
 Contributors: ucfwebcom
 Requires at least: 5.3
 Tested up to: 5.3
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl-3.0.html
@@ -21,6 +21,10 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 
 == Changelog ==
+
+= 2.3.2 =
+Bug fixes:
+* Added missing `show_image` field for the news widget, and updated widget update logic to ensure its value is saved properly (and ensures images are shown by default in layouts that support them).
 
 = 2.3.1 =
 Enhancements:
