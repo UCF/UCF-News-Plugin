@@ -48,8 +48,8 @@ if ( ! class_exists( 'UCF_News_Feed' ) ) {
 				'url'        => $url_override ? $url_override : UCF_News_Config::$default_plugin_options['ucf_news_feed_url'],
 				'limit'      => isset( $args['limit'] ) ? (int) $args['limit'] : 3,
 				'offset'     => isset( $args['offset'] ) ? (int) $args['offset'] : 0,
-				'categories' => isset( $args['sections'] ) ? explode( ',', $args['sections'] ) : null,
-				'tags'       => isset( $args['topics'] ) ? explode( ',', $args['topics'] ) : null,
+				'categories' => isset( $args['sections'] ) ? array_map( 'trim', explode( ',', $args['sections'] ) ) : null,
+				'tags'       => isset( $args['topics'] ) ? array_map( 'trim', explode( ',', $args['topics'] ) ) : null,
 			);
 
 			// Empty array of indexes with no value.
