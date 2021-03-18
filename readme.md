@@ -15,6 +15,10 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 ## Changelog ##
 
+### 2.3.2 ###
+Bug fixes:
+* Added missing `show_image` field for the news widget, and updated widget update logic to ensure its value is saved properly (and ensures images are shown by default in layouts that support them).
+
 ### 2.3.1 ###
 Enhancements:
 * Admin options page improvements (props @strmtrpr83):
