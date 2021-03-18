@@ -22,24 +22,12 @@ if ( ! class_exists( 'UCF_News_Widget' ) ) {
 		* @param array $instance
 		**/
 		public function widget( $args, $instance ) {
-			$title = ! empty( $instance['title'] ) ? $instance['title'] : 'News';
-			$title = apply_filters( 'widget_title', $title, $this->id_base );
-			$title = $args['before_title'] . $title . $args['after_title'];
-			$sections =	str_replace( ' ', '', $instance['sections'] );
-			$topics = str_replace( ' ', '', $instance['topics'] );
-			$limit = (int) $instance['limit'];
-			$per_row = (int) $instance['per_row'];
-			$offset = (int) $instance['offset'];
-			$layout = $instance['layout'];
+			$items_args = UCF_News_Config::apply_default_options( $instance );
 
-			$items_args = array(
-				'title'    => $title,
-				'sections' => $sections,
-				'topics'   => $topics,
-				'limit'    => $limit,
-				'offset'   => $offset,
-				'per_row'  => $per_row
-			);
+			$items_args['title'] = apply_filters( 'widget_title', $items_args['title'], $this->id_base );
+			if ( isset( $args['before_title'] ) && isset( $args['after_title'] ) ) {
+				$items_args['title'] = $args['before_title'] . $items_args['title'] . $args['after_title'];
+			}
 
 			$items = UCF_News_Feed::get_news_items( $items_args );
 
@@ -47,7 +35,7 @@ if ( ! class_exists( 'UCF_News_Widget' ) ) {
 
 			if ( $items ) {
 				echo $args['before_widget'];
-				echo UCF_News_Common::display_news_items( $items, $layout, $items_args, 'widget' );
+				echo UCF_News_Common::display_news_items( $items, $items_args['layout'], $items_args, 'widget' );
 				echo $args['after_widget'];
 			}
 
@@ -64,6 +52,7 @@ if ( ! class_exists( 'UCF_News_Widget' ) ) {
 			$limit = $options['limit'];
 			$offset = $options['offset'];
 			$per_row = $options['per_row'];
+			$show_image = $options['show_image'];
 	?>
 			<p>
 				<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php echo __( 'Title' ); ?></label>
@@ -90,18 +79,30 @@ if ( ! class_exists( 'UCF_News_Widget' ) ) {
 				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'limit' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'limit' ) ); ?>" type="number" value="<?php echo esc_attr( $limit ); ?>" >
 			</p>
 			<p>
-				<label for="<?php echo esc_attr( $this->get_field_id( 'per_row' ) ); ?>"><?php echo __( 'No. of items per row (for card layout only)' ); ?></label>
-				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'per_row' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'per_row' ) ); ?>" type="number" value="<?php echo esc_attr( $per_row ); ?>" >
-			</p>
-			<p>
 				<label for="<?php echo esc_attr( $this->get_field_id( 'offset' ) ); ?>"><?php echo __( 'Offset results' ); ?></label>
 				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'offset' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'offset' ) ); ?>" type="number" value="<?php echo esc_attr( $offset ); ?>" >
 			</p>
+			<p>
+				<label for="<?php echo esc_attr( $this->get_field_id( 'per_row' ) ); ?>"><?php echo __( 'No. of items per row*' ); ?></label>
+				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'per_row' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'per_row' ) ); ?>" type="number" value="<?php echo esc_attr( $per_row ); ?>" >
+			</p>
+			<p>
+				<input id="<?php echo esc_attr( $this->get_field_id( 'show_image' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'show_image' ) ); ?>" type="checkbox" <?php checked( $show_image ); ?> >
+				<label for="<?php echo esc_attr( $this->get_field_id( 'show_image' ) ); ?>"><?php echo __( 'Show images*' ); ?></label>
+			</p>
+			<p><small>* only applied in layouts that support this feature</small></p>
 	<?php
 		}
 
 		public function update( $new_instance, $old_instance ) {
-			$instance = UCF_News_Config::apply_default_options( $new_instance );
+			// $new_instance may not contain all form input values,
+			// so we have to ensure all expected option keys are
+			// present before passing the instance along; otherwise
+			// UCF_News_Config::apply_default_options() may apply
+			// default values in unintended ways
+			$options_base = array_fill_keys( array_keys( UCF_News_Config::$default_options ), null );
+			$instance = array_merge( $options_base, $new_instance );
+			$instance = UCF_News_Config::format_options( $instance );
 
 			return $instance;
 		}
