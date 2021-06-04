@@ -52,10 +52,11 @@ if ( ! class_exists( 'UCF_News_Feed' ) ) {
 				'offset'         => isset( $args['offset'] ) ? (int) $args['offset'] : 0,
 				'category_slugs' => isset( $args['sections'] ) ? self::format_tax_arg( $args['sections'] ) : null,
 				'tag_slugs'      => isset( $args['topics'] ) ? self::format_tax_arg( $args['topics'] ) : null,
+				'search'         => $args['search'] ?? null,
 				'_embed'         => true
 			), array( 'UCF_News_Feed', 'non_empty_allow_zero' ) );
 
-			$query = urldecode( http_build_query( $query_args ) );
+			$query = http_build_query( $query_args );
 
 			// Fetch feed
 			if ( $custom_feed_url === false ) {

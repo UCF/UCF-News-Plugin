@@ -42,6 +42,13 @@ if ( ! class_exists( 'UCF_News_Shortcode' ) ) {
 						'default'   => ''
 					),
 					array(
+						'name'      => 'Filter by Search Query',
+						'param'     => 'search',
+						'desc'      => 'Allows you to filter the results via a search query.',
+						'type'      => 'text',
+						'default'   => ''
+					),
+					array(
 						'name'      => 'Number of News Items',
 						'param'     => 'limit',
 						'desc'      => 'The number of news items to show',
@@ -91,6 +98,7 @@ if ( ! class_exists( 'UCF_News_Shortcode' ) ) {
 				'layout'     => 'classic',
 				'sections'   => '',
 				'topics'     => '',
+				'search'     => '',
 				'offset'     => 0,
 				'limit'      => 3,
 				'per_row'    => 3,
@@ -98,14 +106,13 @@ if ( ! class_exists( 'UCF_News_Shortcode' ) ) {
 				'feed_url'   => ''
 			), $attr );
 
-			$title    = $attr['title'];
-			$layout   = $attr['layout'];
-			$per_row  = $attr['per_row'];
+			$layout = $attr['layout'];
 
 			$args = array(
 				'feed_url' => $attr['feed_url'],
 				'sections' => $attr['sections'] ?: null,
 				'topics'   => $attr['topics'] ?: null,
+				'search'   => $attr['search'] ?: null,
 				'offset'   => $attr['offset'] ? (int) $attr['offset'] : 0,
 				'limit'    => $attr['limit'] ? (int) $attr['limit'] : 3
 			);
