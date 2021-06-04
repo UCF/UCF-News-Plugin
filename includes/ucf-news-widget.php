@@ -49,6 +49,7 @@ if ( ! class_exists( 'UCF_News_Widget' ) ) {
 			$layout = $options['layout'];
 			$sections = $options['sections'];
 			$topics = $options['topics'];
+			$search = $options['search'];
 			$limit = $options['limit'];
 			$offset = $options['offset'];
 			$per_row = $options['per_row'];
@@ -73,6 +74,10 @@ if ( ! class_exists( 'UCF_News_Widget' ) ) {
 			<p>
 				<label for="<?php echo esc_attr( $this->get_field_id( 'topics' ) ); ?>"><?php echo __( 'Filter by topics' ); ?></label>
 				<input class="widefat topic-input" id="<?php echo esc_attr( $this->get_field_id( 'topics' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'topics' ) ); ?>" type="text" value="<?php echo esc_attr( $topics ); ?>" >
+			</p>
+			<p>
+				<label for="<?php echo esc_attr( $this->get_field_id( 'search' ) ); ?>"><?php echo __( 'Filter by search query' ); ?></label>
+				<input class="widefat topic-input" id="<?php echo esc_attr( $this->get_field_id( 'search' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'search' ) ); ?>" type="text" value="<?php echo esc_attr( $search ); ?>" >
 			</p>
 			<p>
 				<label for="<?php echo esc_attr( $this->get_field_id( 'limit' ) ); ?>"><?php echo __( 'Limit results' ); ?></label>
