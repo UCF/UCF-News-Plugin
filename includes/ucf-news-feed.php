@@ -21,10 +21,16 @@ if ( ! class_exists( 'UCF_News_Feed' ) ) {
 			return $result;
 		}
 
-		public static function format_tax_arg( $terms, $tax ) {
-			$terms_filtered = is_array( $terms ) ? array_filter( $terms ) : null;
+		public static function format_tax_arg( $terms, $tax=null ) {
+			if ( is_string( $terms ) ) {
+				$terms = array_map( 'trim', explode( ',', $terms ) );
+			}
 
-			return $terms_filtered;
+			if ( is_array( $terms ) ) {
+				$terms = array_filter( $terms );
+			}
+
+			return is_array( $terms ) && ! empty( $terms ) ? $terms : null;
 		}
 
 		public static function non_empty_allow_zero( $arg ) {
@@ -36,51 +42,31 @@ if ( ! class_exists( 'UCF_News_Feed' ) ) {
 		}
 
 		public static function get_news_items( $args ) {
-			$url_override = get_option( 'ucf_news_feed_url' );
-			$custom_url   = false;
+			$custom_feed_url  = isset( $args['feed_url'] ) && ! empty( $args['feed_url'] ) ? $args['feed_url'] : false;
+			$default_feed_url = get_option( 'ucf_news_feed_url' ) ?: UCF_News_Config::$default_plugin_options['ucf_news_feed_url'];
+			$feed_url         = $custom_feed_url ?: $default_feed_url;
 
-			if ( ! empty( $args['feed_url'] ) ) {
-				$url_override = $args['feed_url'];
-				$custom_url = true;
-			}
-
-			$args = array(
-				'url'        => $url_override ? $url_override : UCF_News_Config::$default_plugin_options['ucf_news_feed_url'],
-				'limit'      => isset( $args['limit'] ) ? (int) $args['limit'] : 3,
-				'offset'     => isset( $args['offset'] ) ? (int) $args['offset'] : 0,
-				'categories' => isset( $args['sections'] ) ? array_map( 'trim', explode( ',', $args['sections'] ) ) : null,
-				'tags'       => isset( $args['topics'] ) ? array_map( 'trim', explode( ',', $args['topics'] ) ) : null,
-			);
-
-			// Empty array of indexes with no value.
-			$args = array_filter( $args, array( 'UCF_News_Feed', 'non_empty_allow_zero' ) );
-
-			// Set up query params.
-			$categories = $tags = array();
-
-			if ( isset( $args['categories'] ) ) {
-				$categories = self::format_tax_arg( $args['categories'], 'category_slugs' );
-			}
-			if ( isset( $args['tags'] ) ) {
-				$tags = self::format_tax_arg( $args['tags'], 'tag_slugs' );
-			}
-
-			$query = urldecode( http_build_query( array(
-				'per_page'       => $args['limit'],
-				'offset'         => $args['offset'],
-				'category_slugs' => $categories,
-				'tag_slugs'      => $tags,
+			// Set up query params
+			$query_args = array_filter( array(
+				'per_page'       => isset( $args['limit'] ) ? (int) $args['limit'] : 3,
+				'offset'         => isset( $args['offset'] ) ? (int) $args['offset'] : 0,
+				'category_slugs' => isset( $args['sections'] ) ? self::format_tax_arg( $args['sections'] ) : null,
+				'tag_slugs'      => isset( $args['topics'] ) ? self::format_tax_arg( $args['topics'] ) : null,
+				'search'         => $args['search'] ?? null,
 				'_embed'         => true
-			) ) );
+			), array( 'UCF_News_Feed', 'non_empty_allow_zero' ) );
+
+			$query = http_build_query( $query_args );
 
 			// Fetch feed
-			$feed_url = $args['url'];
-
-			if ( $custom_url === false ) {
+			if ( $custom_feed_url === false ) {
 				$feed_url .= 'posts';
 			}
 
-			$feed_url .=  '?' . $query;
+			if ( $query ) {
+				$feed_url .= strpos( $feed_url, '?' ) !== false ? '&' : '?';
+				$feed_url .= $query;
+			}
 
 			return self::get_json_feed( $feed_url );
 		}
