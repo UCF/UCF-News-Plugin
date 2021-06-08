@@ -2,7 +2,7 @@
 Contributors: ucfwebcom
 Requires at least: 5.3
 Tested up to: 5.3
-Stable tag: 2.3.2
+Stable tag: 2.4.0
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl-3.0.html
@@ -21,6 +21,12 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 
 == Changelog ==
+
+= 2.4.0 =
+Enhancements:
+* Added new `search` arg for the `[ucf-news-feed]` shortcode, which allows you to filter results by a search query.
+* Tidied up `UCF_News_Feed::get_news_items()` and adjusted `UCF_News_Feed::format_tax_arg()` a bit to omit unset/empty query args from the final feed URL that's requested, and support custom feed URLs that already include query args.
+* Upgraded packages
 
 = 2.3.2 =
 Bug fixes:

@@ -15,6 +15,12 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 ## Changelog ##
 
+### 2.4.0 ###
+Enhancements:
+* Added new `search` arg for the `[ucf-news-feed]` shortcode, which allows you to filter results by a search query.
+* Tidied up `UCF_News_Feed::get_news_items()` and adjusted `UCF_News_Feed::format_tax_arg()` a bit to omit unset/empty query args from the final feed URL that's requested, and support custom feed URLs that already include query args.
+* Upgraded packages
+
 ### 2.3.2 ###
 Bug fixes:
 * Added missing `show_image` field for the news widget, and updated widget update logic to ensure its value is saved properly (and ensures images are shown by default in layouts that support them).
