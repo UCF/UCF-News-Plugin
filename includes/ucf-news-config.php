@@ -10,6 +10,7 @@ if ( ! class_exists( 'UCF_News_Config' ) ) {
 				'layout'     => 'classic',
 				'sections'   => '',
 				'topics'     => '',
+				'search'     => '',
 				'limit'      => 3,
 				'per_row'    => 3,
 				'show_image' => true,

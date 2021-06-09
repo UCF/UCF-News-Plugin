@@ -15,6 +15,10 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 ## Changelog ##
 
+### 2.4.1 ###
+Bug Fixes:
+* Added default `search` option value to `UCF_News_Config::$default_options`, fixing some undefined index notices.
+
 ### 2.4.0 ###
 Enhancements:
 * Added new `search` arg for the `[ucf-news-feed]` shortcode, which allows you to filter results by a search query.
