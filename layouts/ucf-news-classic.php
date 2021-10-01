@@ -6,7 +6,7 @@ if ( ! function_exists( 'ucf_news_display_classic_before' ) ) {
 	function ucf_news_display_classic_before( $content, $items, $args, $display_type ) {
 		ob_start();
 	?>
-		<div class="ucf-news classic">
+		<div class="ucf-news ucf-news-classic">
 	<?php
 		return ob_get_clean();
 	}
@@ -24,7 +24,7 @@ if ( ! function_exists( 'ucf_news_display_classic_title' ) ) {
 			case 'default':
 			default:
 				if ( $formatted_title ) {
-					$formatted_title = '<h2 class="ucf-news-title">' . $formatted_title . '</h2>';
+					$formatted_title = '<h2 class="ucf-news-title mb-4">' . $formatted_title . '</h2>';
 				}
 				break;
 		}
@@ -45,32 +45,32 @@ if ( ! function_exists( 'ucf_news_display_classic' ) ) {
 		}
 
 		ob_start();
+
+		if ( count( $items ) === 0 ) :
+			echo '<div class="ucf-news-error">' . $fallback_message . '</div>';
+		else :
+			foreach ( $items as $item ) :
+				$item_img = UCF_News_Common::get_story_img_tag( $item, 'ucf-news-thumbnail-image img-fluid' );
 	?>
-		<div class="ucf-news-items">
-	<?php if ( count( $items ) === 0 ) : echo $fallback_message; ?>
-	<?php else : ?>
-	<?php
-		foreach( $items as $item ) :
-			$item_img = UCF_News_Common::get_story_img_tag( $item );
-	?>
-			<div class="ucf-news-item">
-				<?php if ( $item_img ): ?>
-				<div class="ucf-news-thumbnail">
-					<?php echo $item_img; ?>
+
+				<div class="ucf-news-item media position-relative mb-4">
+					<?php if ( $item_img ) : ?>
+					<div class="ucf-news-thumbnail d-flex w-25 mr-3" style="max-width: 5em;">
+						<?php echo $item_img; ?>
+					</div>
+					<?php endif; ?>
+					<div class="ucf-news-item-content media-body">
+						<div class="ucf-news-item-details line-height-4">
+							<a class="ucf-news-item-title stretched-link" href="<?php echo $item->link; ?>" style="color: inherit;">
+								<?php echo $item->title->rendered; ?>
+							</a>
+						</div>
+					</div>
 				</div>
-				<?php endif; ?>
-				<div class="ucf-news-item-title">
-					<a href="<?php echo $item->link; ?>">
-						<?php echo $item->title->rendered; ?>
-					</a>
-				</div>
-			</div>
 	<?php
-		endforeach;
-	endif; // End if item count
-	?>
-	</div>
-	<?php
+			endforeach;
+		endif; // End if item count
+
 		return ob_get_clean();
 	}
 

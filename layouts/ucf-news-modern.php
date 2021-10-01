@@ -60,7 +60,7 @@ if ( ! function_exists( 'ucf_news_display_modern' ) ) {
 
 				<div class="media">
 					<?php if ( $item_img ) : ?>
-					<div class="ucf-news-item-thumbnail d-flex w-25 mr-3" style="max-width: 150px;">
+					<div class="ucf-news-thumbnail d-flex w-25 mr-3" style="max-width: 150px;">
 						<?php echo $item_img; ?>
 					</div>
 					<?php endif; ?>
@@ -72,7 +72,7 @@ if ( ! function_exists( 'ucf_news_display_modern' ) ) {
 						<?php endif; ?>
 
 						<div class="ucf-news-item-details">
-							<a class="ucf-news-item-title d-block stretched-link text-secondary h5 mb-2 pb-1" href="<?php echo $item->link; ?>">
+							<a class="ucf-news-item-title d-block stretched-link h5 mb-2 pb-1" href="<?php echo $item->link; ?>" style="color: inherit;">
 								<?php echo $item->title->rendered; ?>
 							</a>
 							<div class="ucf-news-item-excerpt font-size-sm">
