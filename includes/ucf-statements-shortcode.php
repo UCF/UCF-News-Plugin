@@ -34,7 +34,7 @@ if ( ! class_exists( 'UCF_Statements_Shortcode' ) ) {
 				'group'   => 'UCF News'
 			);
 
-			$registered_shortcodes[] = $shortcodes;
+			$registered_shortcodes[] = $shortcode;
 			return $registered_shortcodes;
 		}
 

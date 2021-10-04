@@ -6,7 +6,7 @@ if ( ! function_exists( 'ucf_news_display_card_before' ) ) {
 	function ucf_news_display_card_before( $content, $items, $args, $display_type ) {
 		ob_start();
 	?>
-		<div class="ucf-news card-layout">
+		<div class="ucf-news ucf-news-card">
 	<?php
 		return ob_get_clean();
 	}
@@ -24,7 +24,7 @@ if ( ! function_exists( 'ucf_news_display_card_title' ) ) {
 			case 'default':
 			default:
 				if ( $formatted_title ) {
-					$formatted_title = '<h2 class="ucf-news-title">' . $formatted_title . '</h2>';
+					$formatted_title = '<h2 class="ucf-news-title mb-4">' . $formatted_title . '</h2>';
 				}
 				break;
 		}
@@ -49,37 +49,46 @@ if ( ! function_exists( 'ucf_news_display_card' ) ) {
 
 		ob_start();
 
-		echo '<div class="ucf-news-card-deck">';
-
-	if ( count( $items ) === 0 ) : echo $fallback_message; else :
-
-		foreach ( $items as $index=>$item ) :
-			$date = date( "M d", strtotime( $item->date ) );
-			$item_img = UCF_News_Common::get_story_img_tag( $item );
+		if ( count( $items ) === 0 && $fallback_message ) :
+			echo '<div class="ucf-news-error">' . $fallback_message . '</div>';
+		else :
 	?>
-		<?php
-			if( $index !== 0 && ( $index % $per_row ) === 0 ) {
-				echo '</div><div class="ucf-news-card-deck">';
-			}
-		?>
-		<div class="ucf-news-card">
-			<a class="ucf-news-card-link" href="<?php echo $item->link; ?>">
-				<?php if ( $item_img && $show_image ): ?>
-					<?php echo $item_img; ?>
-				<?php endif; ?>
+		<div class="ucf-news-card-deck row">
+			<?php
+			foreach ( $items as $index => $item ) :
+				$date = date( "M d", strtotime( $item->date ) );
+				$item_img = UCF_News_Common::get_story_img_tag( $item, 'ucf-news-thumbnail-image img-fluid w-md-100' );
 
-				<div class="ucf-news-card-block">
-					<h3 class="ucf-news-card-title"><?php echo $item->title->rendered; ?></h3>
-					<p class="ucf-news-card-text"><?php echo $date; ?></p>
+				if ( $index !== 0 && ( $index % $per_row ) === 0 ) {
+					echo '</div><div class="ucf-news-card-deck row">';
+				}
+			?>
+				<div class="ucf-news-item col-lg mb-4 pb-lg-2">
+					<div class="ucf-news-card card h-100" style="background-color: transparent; border-color: rgba(118, 118, 118, .25);">
+						<div class="row no-gutters">
+							<?php if ( $item_img && $show_image ): ?>
+							<div class="ucf-news-thumbnail col-4 col-md-3 col-lg-12 py-3 pl-3 p-lg-0">
+								<?php echo $item_img; ?>
+							</div>
+							<?php endif; ?>
+							<div class="col position-static">
+								<div class="ucf-news-item-content card-block">
+									<a class="ucf-news-item-title card-title stretched-link d-block font-weight-bold mb-0 line-height-3" href="<?php echo $item->link; ?>" style="color: inherit;">
+										<?php echo $item->title->rendered; ?>
+									</a>
+								</div>
+								<div class="ucf-news-card-text card-footer border-0 bg-transparent font-italic font-size-sm" style="background-color: transparent; opacity: .6;">
+									<?php echo $date; ?>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-			</a>
+			<?php endforeach; ?>
 		</div>
+
 	<?php
-		endforeach;
-
-	endif; // End if item count
-
-		echo '</div>';
+		endif; // End if item count
 
 		return ob_get_clean();
 	}
