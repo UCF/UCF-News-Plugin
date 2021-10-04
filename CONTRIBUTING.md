@@ -96,7 +96,7 @@ Adhering to the following process is the best way to submit a pull request:
 
 5. Commit your changes in logical chunks. Please provide [helpful, readable commit messages](https://chris.beams.io/posts/git-commit/) (avoid nondescriptive messages such as "bugfix" or "minor change").
 
-    If you're making changes to scss or js files, make sure you're minifying **and committing** those minified file changes.  scss and js file processing should be performed using gulp commands provided in the repo (see [gulpfile.js](https://github.com/UCF/UCF-News-Plugin/blob/master/gulpfile.js))
+    If you're making changes to JS files, make sure you're minifying **and committing** those minified file changes.  JS file processing should be performed using gulp commands provided in the repo (see [gulpfile.js](https://github.com/UCF/UCF-News-Plugin/blob/master/gulpfile.js))
 
     Additionally, make sure that any changes to the README are made in `README.txt`, NOT `README.md`.  The `README.md` file is generated automatically via the `gulp readme` task.  If you have any README updates to include with your changes, please make sure to run `gulp readme` so that both files get updated.
 
@@ -141,19 +141,6 @@ Whenever you add or modify code in this repo, please follow the code style guide
 - Use tags and elements appropriate for an HTML5 doctype (e.g., self-closing tags).
 - Use CDNs and HTTPS when referencing third-party JS.
 - Use [WAI-ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA) attributes when appropriate to promote accessibility.
-
-### CSS/Sass
-
-Adhere to the [mdo Code Guide](http://codeguide.co/#css) for basic CSS formatting guidelines, except for what's noted below.
-
-Use [CSS-Tricks' Sass Style Guide](https://css-tricks.com/sass-style-guide/) for Sass-specific features (e.g. order of extends, mixin inclusions, etc in a ruleset).
-
-- Declaration order: declarations should be in alphabetical order.
-- Selectors: all selectors in a ruleset should be on their own line.
-- All generated color pallettes and font sizes/weights should comply with [WCAG 2.0 AA contrast guidelines](https://www.w3.org/TR/WCAG20/#visual-audio-contrast) in their default state.  Components and utilities with hover/focus/active states should try to comply with these contrast requirements whenever possible.
-- Except in rare cases, don't remove default `:focus` styles (via e.g. `outline: none;`) without providing alternative styles. See [this A11Y Project post](http://a11yproject.com/posts/never-remove-css-outlines/) for more details.
-
-New/modified Sass code should not throw any Sass-lint errors.  We recommend using a [Sass-lint integration with your IDE of choice](https://www.npmjs.com/package/sass-lint#ide-integration) to show linter warnings/errors as you code.  This repo includes a Sass-lint config file with the desired linter rulesets for this project.
 
 ### JS
 

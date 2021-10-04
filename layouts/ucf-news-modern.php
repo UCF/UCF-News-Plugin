@@ -6,7 +6,7 @@ if ( ! function_exists( 'ucf_news_display_modern_before' ) ) {
 	function ucf_news_display_modern_before( $content, $items, $args, $display_type ) {
 		ob_start();
 	?>
-		<div class="ucf-news modern">
+		<div class="ucf-news ucf-news-modern">
 	<?php
 		return ob_get_clean();
 	}
@@ -24,7 +24,7 @@ if ( ! function_exists( 'ucf_news_display_modern_title' ) ) {
 			case 'default':
 			default:
 				if ( $formatted_title ) {
-					$formatted_title = '<h2 class="ucf-news-title">' . $formatted_title . '</h2>';
+					$formatted_title = '<h2 class="ucf-news-title mb-4">' . $formatted_title . '</h2>';
 				}
 				break;
 		}
@@ -46,36 +46,46 @@ if ( ! function_exists( 'ucf_news_display_modern' ) ) {
 
 		ob_start();
 
-	if ( count( $items ) === 0 ) : echo $fallback_message; else :
+		if ( count( $items ) === 0 && $fallback_message ) :
+			echo '<div class="ucf-news-error">' . $fallback_message . '</div>';
+		else :
 
-		foreach( $items as $item ) :
-			$item_img = UCF_News_Common::get_story_img_tag( $item );
-			$section = UCF_News_Common::get_story_primary_section( $item );
+			foreach ( $items as $item ) :
+				$item_img = UCF_News_Common::get_story_img_tag( $item, 'ucf-news-thumbnail-image img-fluid' );
+				$section = UCF_News_Common::get_story_primary_section( $item );
 	?>
-		<div class="ucf-news-item">
-			<a href="<?php echo $item->link; ?>">
-				<?php if ( $item_img ) : ?>
-				<div class="ucf-news-thumbnail">
-					<?php echo $item_img; ?>
-				</div>
-				<?php endif; ?>
-				<div class="ucf-news-item-content">
-					<?php if ( $section ): ?>
-					<div class="ucf-news-section">
-						<span class="ucf-news-section-title"><?php echo $section->name; ?></span>
+
+			<div class="ucf-news-item media-background-container hover-parent p-3 mb-3" style="margin-left: -1rem; margin-right: -1rem;">
+				<div class="media-background hover-child-show fade" style="background-color: rgba(204, 204, 204, .25);"></div>
+
+				<div class="media">
+					<?php if ( $item_img ) : ?>
+					<div class="ucf-news-thumbnail d-flex w-25 mr-3" style="max-width: 150px;">
+						<?php echo $item_img; ?>
 					</div>
 					<?php endif; ?>
-					<div class="ucf-news-item-details">
-						<p class="ucf-news-item-title"><?php echo $item->title->rendered; ?></p>
-						<p class="ucf-news-item-excerpt"><?php echo wp_trim_words( $item->excerpt->rendered, 25 ); ?></p>
+					<div class="ucf-news-item-content media-body">
+						<?php if ( $section ) : ?>
+						<div class="ucf-news-section mb-2 pb-1">
+							<span class="ucf-news-section-title badge badge-primary"><?php echo $section->name; ?></span>
+						</div>
+						<?php endif; ?>
+
+						<div class="ucf-news-item-details">
+							<a class="ucf-news-item-title d-block stretched-link h5 mb-2 pb-1" href="<?php echo $item->link; ?>" style="color: inherit;">
+								<?php echo $item->title->rendered; ?>
+							</a>
+							<div class="ucf-news-item-excerpt font-size-sm">
+								<?php echo wp_trim_words( $item->excerpt->rendered, 25 ); ?>
+							</div>
+						</div>
 					</div>
 				</div>
-			</a>
-		</div>
+			</div>
 	<?php
-		endforeach;
+			endforeach;
 
-	endif; // End if item count
+		endif; // End if item count
 
 		return ob_get_clean();
 	}
