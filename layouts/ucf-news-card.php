@@ -59,11 +59,12 @@ if ( ! function_exists( 'ucf_news_display_card' ) ) {
 				$date = date( "M d", strtotime( $item->date ) );
 				$item_img = UCF_News_Common::get_story_img_tag( $item, 'ucf-news-thumbnail-image img-fluid w-md-100' );
 
-				if ( $index !== 0 && ( $index % $per_row ) === 0 ) {
-					echo '</div><div class="ucf-news-card-deck row">';
-				}
+				// Try to use precise column sizes where we can to
+				// prevent undesirable column overflow in small containers
+				$col_size = 12 % $per_row === 0 ? 12 / $per_row : '';
+				$col_class = $col_size ? "col-lg-{$col_size}" : 'col-lg';
 			?>
-				<div class="ucf-news-item col-lg mb-4 pb-lg-2">
+				<div class="ucf-news-item <?php echo $col_class; ?> mb-4 pb-lg-2">
 					<div class="ucf-news-card card h-100" style="background-color: transparent; border-color: rgba(118, 118, 118, .25);">
 						<div class="row no-gutters">
 							<?php if ( $item_img && $show_image ): ?>
