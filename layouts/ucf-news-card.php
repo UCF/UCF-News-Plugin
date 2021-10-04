@@ -77,7 +77,7 @@ if ( ! function_exists( 'ucf_news_display_card' ) ) {
 										<?php echo $item->title->rendered; ?>
 									</a>
 								</div>
-								<div class="ucf-news-card-text card-footer border-0 bg-transparent font-italic font-size-sm" style="background-color: transparent; opacity: .8;">
+								<div class="ucf-news-card-text card-footer border-0 bg-transparent font-italic font-size-sm" style="background-color: transparent; opacity: .6;">
 									<?php echo $date; ?>
 								</div>
 							</div>
