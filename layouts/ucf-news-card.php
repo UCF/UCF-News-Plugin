@@ -63,6 +63,10 @@ if ( ! function_exists( 'ucf_news_display_card' ) ) {
 				// prevent undesirable column overflow in small containers
 				$col_size = 12 % $per_row === 0 ? 12 / $per_row : '';
 				$col_class = $col_size ? "col-lg-{$col_size}" : 'col-lg';
+
+				if ( $index !== 0 && ( $index % $per_row ) === 0 ) {
+					echo '</div><div class="ucf-news-card-deck row">';
+				}
 			?>
 				<div class="ucf-news-item <?php echo $col_class; ?> mb-4 pb-lg-2">
 					<div class="ucf-news-card card h-100" style="background-color: transparent; border-color: rgba(118, 118, 118, .25);">
