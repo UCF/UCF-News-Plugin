@@ -46,7 +46,7 @@ if ( ! function_exists( 'ucf_news_display_classic' ) ) {
 
 		ob_start();
 
-		if ( count( $items ) === 0 ) :
+		if ( count( $items ) === 0 && $fallback_message ) :
 			echo '<div class="ucf-news-error">' . $fallback_message . '</div>';
 		else :
 			foreach ( $items as $item ) :
