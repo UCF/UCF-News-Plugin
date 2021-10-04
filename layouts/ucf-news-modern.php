@@ -55,8 +55,8 @@ if ( ! function_exists( 'ucf_news_display_modern' ) ) {
 				$section = UCF_News_Common::get_story_primary_section( $item );
 	?>
 
-			<div class="ucf-news-item position-relative hover-parent p-3 mb-3" style="margin-left: -1rem; margin-right: -1rem;">
-				<div class="media-background hover-child-show fade bg-faded"></div>
+			<div class="ucf-news-item media-background-container hover-parent p-3 mb-3" style="margin-left: -1rem; margin-right: -1rem;">
+				<div class="media-background hover-child-show fade" style="background-color: rgba(204, 204, 204, .25);"></div>
 
 				<div class="media">
 					<?php if ( $item_img ) : ?>
