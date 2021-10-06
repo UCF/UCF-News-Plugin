@@ -83,7 +83,7 @@ if ( ! class_exists( 'UCF_News_Shortcode' ) ) {
 					'desc'    => 'Displays a feed of UCF News items.',
 					'content' => false,
 					'fields'  => $fields,
-					'preview' => true,
+					'preview' => false,
 					'group'   => 'UCF News'
 				);
 
@@ -127,15 +127,5 @@ if ( ! class_exists( 'UCF_News_Shortcode' ) ) {
 
 			return ob_get_clean();
 		}
-	}
-}
-
-if ( ! function_exists( 'ucf_news_shortcode_interface_styles' ) ) {
-	function ucf_news_shortcode_interface_styles( $stylesheets ) {
-		$defaults = UCF_News_Config::get_default_plugin_options();
-		if ( get_option( 'ucf_news_include_css', $defaults['ucf_news_include_css'] ) === 'on' ) {
-			$stylesheets[] = plugins_url( 'static/css/ucf-news.min.css', UCF_NEWS__PLUGIN_FILE );
-		}
-		return $stylesheets;
 	}
 }

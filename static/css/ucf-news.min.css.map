@@ -1,7 +1,0 @@
-{
-"version": 3,
-"mappings": "AACE,sBAAW,CACT,aAAa,CAAE,IAAI,CACnB,OAAO,CAAE,KAAK,CAEd,sCAAgB,CACd,KAAK,CAAE,IAAI,CACX,YAAY,CAAE,IAAI,CAClB,UAAU,CAAE,IAAI,CAChB,SAAS,CAAE,IAAI,CAEf,4DAAsB,CACpB,aAAa,CAAE,IAAI,CACnB,MAAM,CAAE,IAAI,CACZ,SAAS,CAAE,IAAI",
-"sources": ["../../src/scss/ucf-news.scss"],
-"names": [],
-"file": "ucf-news.min.css"
-}
