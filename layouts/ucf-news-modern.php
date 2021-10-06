@@ -51,7 +51,7 @@ if ( ! function_exists( 'ucf_news_display_modern' ) ) {
 		else :
 
 			foreach ( $items as $item ) :
-				$item_img = UCF_News_Common::get_story_img_tag( $item, 'ucf-news-thumbnail-image img-fluid' );
+				$item_img = UCF_News_Common::get_story_img_tag( $item, 'ucf-news-thumbnail-image img-fluid w-100' );
 				$section = UCF_News_Common::get_story_primary_section( $item );
 	?>
 
