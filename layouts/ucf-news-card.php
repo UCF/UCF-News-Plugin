@@ -57,7 +57,7 @@ if ( ! function_exists( 'ucf_news_display_card' ) ) {
 			<?php
 			foreach ( $items as $index => $item ) :
 				$date = date( "M d", strtotime( $item->date ) );
-				$item_img = UCF_News_Common::get_story_img_tag( $item, 'ucf-news-thumbnail-image img-fluid w-md-100' );
+				$item_img = UCF_News_Common::get_story_img_tag( $item, 'ucf-news-thumbnail-image img-fluid w-100' );
 
 				// Try to use precise column sizes where we can to
 				// prevent undesirable column overflow in small containers

@@ -50,7 +50,7 @@ if ( ! function_exists( 'ucf_news_display_classic' ) ) {
 			echo '<div class="ucf-news-error">' . $fallback_message . '</div>';
 		else :
 			foreach ( $items as $item ) :
-				$item_img = UCF_News_Common::get_story_img_tag( $item, 'ucf-news-thumbnail-image img-fluid' );
+				$item_img = UCF_News_Common::get_story_img_tag( $item, 'ucf-news-thumbnail-image img-fluid w-100' );
 	?>
 
 				<div class="ucf-news-item media position-relative mb-4">
