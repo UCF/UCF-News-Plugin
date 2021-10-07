@@ -1,11 +1,11 @@
 # UCF News Plugin #
 
-Provides a shortcode, widget, functions, and default styles for displaying UCF news.
+Provides a shortcode, widget, and functions for displaying UCF news.
 
 
 ## Description ##
 
-This plugin provides a shortcode, widget, helper functions, and default styles for displaying news stories from [UCF Today](https://www.ucf.edu/news/).  It is written to work out-of-the-box for non-programmers, but is also extensible and customizable for developers.
+This plugin provides a shortcode, widget, and helper functions for displaying news stories from [UCF Today](https://www.ucf.edu/news/).  It is written to work out-of-the-box for non-programmers, but is also extensible and customizable for developers.
 
 
 ## Documentation ##
@@ -14,6 +14,30 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 
 ## Changelog ##
+
+### 3.0.0 ###
+Enhancements:
+* Updated all [ucf-news-feed] layouts provided out-of-the-box to utilize Athena Framework classes.  **This is a breaking change**--please read below ("Upgrade Notice") for details before upgrading this plugin in production.
+
+  This update will make it easier to maintain layouts moving forward, and provides a performance benefit by no longer needing to enqueue an additional stylesheet on every front-facing post/page.
+* Removed the "Include Default CSS" plugin option and associated stylesheet.
+* Upgraded packages, and removed packages and gulp tasks related to CSS minification.
+
+Bug Fixes:
+* Fixed an issue where Today stories with a video header (and, therefore, an oembed poster as a thumbnail) would never display a thumbnail in [ucf-news-feed] layouts.
+
+Upgrade Notice:
+* A theme that includes the Athena Framework is now _required_ for layouts provided by the plugin to display as intended.
+
+  You should be able to safely upgrade to v3.0.0 of this plugin if your site meets all of the following criteria:
+  * Your site uses the UCF WordPress Theme v0.7.2+, Colleges Theme v1.1.2+, or any other WordPress theme that includes the Athena Framework v1.1.0+
+  * Your site _does not_ reference existing CSS classes from the "classic", "modern" or "card" layouts (such as `.ucf-news-item`, `.ucf-news-thumbnail`) in custom layouts, markup on posts/pages, or markup within your theme or another plugin
+
+  However, we recommend testing this upgrade in a development/QA environment before upgrading in production.
+
+  If your site does include references to CSS classes from the "classic", "modern" or "card" layouts and depends on them for styling, you should update or remove them prior to upgrading this plugin.
+
+  If your site's active theme does not include the Athena Framework, you can still [override and/or define your own custom layouts](https://github.com/UCF/UCF-News-Plugin/wiki/Custom-Layouts) as needed.
 
 ### 2.4.1 ###
 Bug Fixes:
@@ -172,12 +196,13 @@ Bug Fixes:
 
 ## Upgrade Notice ##
 
+* v3.0.0: All layouts provided by the plugin require the Athena Framework to display as intended.  [More details](#300)
 * v2.2.2: PHP 7.0+ is required.
 
 
 ## Development ##
 
-Note that compiled, minified css and js files are included within the repo.  Changes to these files should be tracked via git (so that users installing the plugin using traditional installation methods will have a working plugin out-of-the-box.)
+Note that compiled, minified JS files are included within the repo.  Changes to these files should be tracked via git (so that users installing the plugin using traditional installation methods will have a working plugin out-of-the-box.)
 
 [Enabling debug mode](https://codex.wordpress.org/Debugging_in_WordPress) in your `wp-config.php` file is recommended during development to help catch warnings and bugs.
 
@@ -190,14 +215,14 @@ Note that compiled, minified css and js files are included within the repo.  Cha
 2. `cd` into the new UCF-News-Plugin directory, and run `npm install` to install required packages for development into `node_modules/` within the repo
 3. Optional: If you'd like to enable [BrowserSync](https://browsersync.io) for local development, or make other changes to this project's default gulp configuration, copy `gulp-config.template.json`, make any desired changes, and save as `gulp-config.json`.
 
-    To enable BrowserSync, set `sync` to `true` and assign `syncTarget` the base URL of a site on your local WordPress instance that will use this plugin, such as `http://localhost/wordpress/my-site/`.  Your `syncTarget` value will vary depending on your local host setup.
+    To enable BrowserSync, set `sync` to `true` and assign `target` the base URL of a site on your local WordPress instance that will use this plugin, such as `http://localhost/wordpress/my-site/`.  Your `target` value will vary depending on your local host setup.
 
     The full list of modifiable config values can be viewed in `gulpfile.js` (see `config` variable).
 3. Run `gulp default` to process front-end assets.
 4. If you haven't already done so, create a new WordPress site on your development environment to test this plugin against.
 5. Activate this plugin on your development WordPress site.
 6. Configure plugin settings from the WordPress admin under "UCF News".
-7. Run `gulp watch` to continuously watch changes to scss and js files.  If you enabled BrowserSync in `gulp-config.json`, it will also reload your browser when plugin files change.
+7. Run `gulp watch` to continuously watch changes to JS files.  If you enabled BrowserSync in `gulp-config.json`, it will also reload your browser when plugin files change.
 
 ### Other Notes ###
 * This plugin's README.md file is automatically generated. Please only make modifications to the README.txt file, and make sure the `gulp readme` command has been run before committing README changes.  See the [contributing guidelines](https://github.com/UCF/UCF-News-Plugin/blob/master/CONTRIBUTING.md) for more information.
