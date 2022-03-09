@@ -69,7 +69,7 @@ if ( ! function_exists( 'ucf_news_display_card' ) ) {
 				}
 			?>
 				<div class="ucf-news-item <?php echo $item_col_class; ?> mb-4 pb-lg-2">
-					<div class="ucf-news-card card h-lg-100" style="background-color: transparent; border-color: rgba(118, 118, 118, .25);">
+					<div class="ucf-news-card card h-lg-100 hover-parent" style="background-color: transparent; border-color: rgba(118, 118, 118, .25);">
 						<div class="row no-gutters">
 							<?php if ( $item_img && $show_image ): ?>
 							<div class="ucf-news-thumbnail col-4 col-md-3 col-lg-12 py-3 pl-3 p-lg-0">
@@ -78,7 +78,7 @@ if ( ! function_exists( 'ucf_news_display_card' ) ) {
 							<?php endif; ?>
 							<div class="col col-lg-12 position-static">
 								<div class="ucf-news-item-content card-block">
-									<a class="ucf-news-item-title card-title stretched-link d-block font-weight-bold mb-0 line-height-3" href="<?php echo $item->link; ?>" style="color: inherit;">
+									<a class="ucf-news-item-title card-title stretched-link text-decoration-none hover-child-text-underline d-block font-weight-bold mb-0 line-height-3" href="<?php echo $item->link; ?>" style="color: inherit;">
 										<?php echo $item->title->rendered; ?>
 									</a>
 								</div>

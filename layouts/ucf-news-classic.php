@@ -61,7 +61,7 @@ if ( ! function_exists( 'ucf_news_display_classic' ) ) {
 					<?php endif; ?>
 					<div class="ucf-news-item-content media-body">
 						<div class="ucf-news-item-details line-height-4">
-							<a class="ucf-news-item-title stretched-link" href="<?php echo $item->link; ?>" style="color: inherit;">
+							<a class="ucf-news-item-title stretched-link font-weight-bold text-decoration-none hover-text-underline" href="<?php echo $item->link; ?>" style="color: inherit;">
 								<?php echo $item->title->rendered; ?>
 							</a>
 						</div>
