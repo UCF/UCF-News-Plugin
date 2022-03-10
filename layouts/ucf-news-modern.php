@@ -72,7 +72,7 @@ if ( ! function_exists( 'ucf_news_display_modern' ) ) {
 						<?php endif; ?>
 
 						<div class="ucf-news-item-details">
-							<a class="ucf-news-item-title d-block stretched-link h5 mb-2 pb-1" href="<?php echo $item->link; ?>" style="color: inherit;">
+							<a class="ucf-news-item-title d-block stretched-link text-decoration-none h5 mb-2 pb-1" href="<?php echo $item->link; ?>" style="color: inherit;">
 								<?php echo $item->title->rendered; ?>
 							</a>
 							<div class="ucf-news-item-excerpt font-size-sm">
