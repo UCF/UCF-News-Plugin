@@ -15,6 +15,12 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 ## Changelog ##
 
+### 3.0.1 ###
+Enhancements:
+* Explicitly unset underline styles on news item links to reduce visual clutter in anticipation of themes updating to Athena v1.1.1.  Added underlines on hover/focus where there are no other visual differences in those states.
+* Replaced usage of nonexistent `.text-small` class in external stories default layout with `.font-size-sm`
+* Upgraded packages
+
 ### 3.0.0 ###
 Enhancements:
 * Updated all [ucf-news-feed] layouts provided out-of-the-box to utilize Athena Framework classes.  **This is a breaking change**--please read below ("Upgrade Notice") for details before upgrading this plugin in production.
