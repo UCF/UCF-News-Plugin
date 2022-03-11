@@ -38,13 +38,12 @@ if ( ! function_exists( 'ucf_external_stories_classic_content' ) ) {
 		foreach( $items as $item ) :
 	?>
 		<article class="mb-3">
-			<a href="<?php echo $item->url; ?>" target="_blank" rel="nofollow">
-				<h3 class="h6 text-secondary external-story-title"><?php echo $item->title; ?></h3>
+			<a class="text-secondary text-decoration-none hover-text-underline" href="<?php echo $item->url; ?>" target="_blank" rel="nofollow">
+				<h3 class="h6 external-story-title"><?php echo $item->title; ?></h3>
 			</a>
-			<cite class="external-story-source text-muted text-small">
+			<cite class="external-story-source text-muted font-size-sm">
 				<?php echo $item->source; ?>
 			</cite>
-
 		</article>
 	<?php
 		endforeach;
