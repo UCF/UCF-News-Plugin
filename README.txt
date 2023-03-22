@@ -1,8 +1,8 @@
 === UCF News Plugin ===
 Contributors: ucfwebcom
 Requires at least: 5.3
-Tested up to: 5.3
-Stable tag: 3.0.1
+Tested up to: 6.1
+Stable tag: 3.0.2
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl-3.0.html
@@ -21,6 +21,10 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 
 == Changelog ==
+
+= 3.0.2 =
+Enhancements:
+* Added composer file.
 
 = 3.0.1 =
 Enhancements:

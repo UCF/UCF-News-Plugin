@@ -1,0 +1,8 @@
+{
+    "name": "ucf/ucf-news-plugin",
+    "description": "Provides a shortcode, widget, and functions for displaying UCF news.",
+    "type": "wordpress-plugin",
+    "require": {
+        "composer/installers": "~1.0"
+    }
+}

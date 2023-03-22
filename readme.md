@@ -15,6 +15,10 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 ## Changelog ##
 
+### 3.0.2 ###
+Enhancements:
+* Added composer file.
+
 ### 3.0.1 ###
 Enhancements:
 * Explicitly unset underline styles on news item links to reduce visual clutter in anticipation of themes updating to Athena v1.1.1.  Added underlines on hover/focus where there are no other visual differences in those states.
