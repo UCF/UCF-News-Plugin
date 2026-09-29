@@ -15,9 +15,10 @@ if ( ! class_exists( 'UCF_News_Block' ) ) {
 		public static function register() {
 			global $wp_version;
 
-			// Metadata-based block registration is only enabled on WordPress 5.5+.
+			// Metadata-based block registration requires WordPress 5.8+, because
+			// register_block_type() only accepts a block.json path starting in 5.8.
 			// Older sites keep all existing shortcode/widget functionality unchanged.
-			if ( ! function_exists( 'register_block_type' ) || version_compare( $wp_version, '5.5', '<' ) ) {
+			if ( ! function_exists( 'register_block_type' ) || version_compare( $wp_version, '5.8', '<' ) ) {
 				return;
 			}
 
