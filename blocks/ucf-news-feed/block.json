@@ -1,7 +1,7 @@
 {
   "apiVersion": 2,
   "name": "ucf-news/news-feed",
-  "version": "3.1.0-alpha.5",
+  "version": "4.0.0",
   "title": "UCF News Feed",
   "category": "widgets",
   "icon": "megaphone",
