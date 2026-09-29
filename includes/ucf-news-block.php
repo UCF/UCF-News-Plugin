@@ -2,7 +2,7 @@
 /**
  * Gutenberg block support for UCF News.
  *
- * @since 3.1.0
+ * @since 4.0.0
  */
 
 if ( ! class_exists( 'UCF_News_Block' ) ) {
