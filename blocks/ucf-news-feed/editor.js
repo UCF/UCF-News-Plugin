@@ -1,4 +1,4 @@
-(function (apiFetch, blocks, blockEditor, components, element, i18n) {
+(function (apiFetch, blocks, blockEditor, components, element, htmlEntities, i18n) {
   'use strict';
 
   var el = element.createElement;
@@ -8,48 +8,118 @@
   var InspectorControls = blockEditor.InspectorControls;
   var useBlockProps = blockEditor.useBlockProps;
   var PanelBody = components.PanelBody;
-  var SearchControl = components.SearchControl;
-  var CheckboxControl = components.CheckboxControl;
-  var Button = components.Button;
+  var FormTokenField = components.FormTokenField;
   var RangeControl = components.RangeControl;
   var Spinner = components.Spinner;
   var Notice = components.Notice;
+  var decodeEntities = htmlEntities.decodeEntities;
   var __ = i18n.__;
 
   // Editor control for searching and selecting categories or tags.
   function TaxonomyControl(props) {
     var selected = props.value || [];
-    var stateSearch = useState('');
-    var search = stateSearch[0];
-    var setSearch = stateSearch[1];
-    var stateResults = useState([]);
-    var results = stateResults[0];
-    var setResults = stateResults[1];
-    var stateLoading = useState(false);
-    var loading = stateLoading[0];
-    var setLoading = stateLoading[1];
+    var stateTerms = useState({});
+    var termsBySlug = stateTerms[0];
+    var setTermsBySlug = stateTerms[1];
+    var stateSuggestions = useState([]);
+    var suggestions = stateSuggestions[0];
+    var setSuggestions = stateSuggestions[1];
     var stateError = useState(false);
     var error = stateError[0];
     var setError = stateError[1];
+    var feedUrl = window.ucfNewsBlock && window.ucfNewsBlock.feedUrl
+      ? window.ucfNewsBlock.feedUrl
+      : '';
 
+    function addTermsToMap(terms) {
+      setTermsBySlug(function (current) {
+        var next = Object.assign({}, current);
+
+        terms.forEach(function (term) {
+          if (term && term.slug) {
+            next[term.slug] = decodeEntities(term.name || term.slug);
+          }
+        });
+
+        return next;
+      });
+    }
+
+    // Resolve saved slugs so existing blocks display human-readable token names.
     useEffect(function () {
-      var cancelled = false;
-      var timer;
+      var controller;
+      var query;
+      var url;
 
-      if (search.length < 2) {
-        setResults([]);
-        setError(false);
+      if (!feedUrl || !selected.length) {
         return function () {};
       }
 
-      timer = window.setTimeout(function () {
-        var url = window.ajaxurl
-          + '?action=' + encodeURIComponent(props.action)
-          + '&format=json&q=' + encodeURIComponent(search);
-        setLoading(true);
-        setError(false);
+      controller = new window.AbortController();
+      query = new window.URLSearchParams();
+      query.set('slug', selected.join(','));
+      query.set('per_page', '100');
+      query.set('_fields', 'slug,name');
+      url = feedUrl + props.taxonomy + '?' + query.toString();
 
-        window.fetch(url, { credentials: 'same-origin' })
+      window.fetch(url, { signal: controller.signal })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Request failed');
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          addTermsToMap(Array.isArray(data) ? data : []);
+          setError(false);
+        })
+        .catch(function (requestError) {
+          if (requestError.name !== 'AbortError') {
+            setError(true);
+          }
+        });
+
+      return function () {
+        controller.abort();
+      };
+    }, [feedUrl, props.taxonomy, selected.join(',')]);
+
+    function searchTerms(input) {
+      var controller = searchTerms.controller;
+      var timer = searchTerms.timer;
+
+      if (controller) {
+        controller.abort();
+      }
+      if (timer) {
+        window.clearTimeout(timer);
+      }
+
+      if (!input) {
+        setSuggestions([]);
+        setError(false);
+        return;
+      }
+
+      if (!feedUrl) {
+        setSuggestions([]);
+        setError(true);
+        return;
+      }
+
+      searchTerms.timer = window.setTimeout(function () {
+        var query = new window.URLSearchParams();
+        var url;
+
+        searchTerms.controller = new window.AbortController();
+        query.set('search', input);
+        query.set('per_page', '20');
+        query.set('orderby', 'count');
+        query.set('order', 'desc');
+        query.set('_fields', 'slug,name');
+        url = feedUrl + props.taxonomy + '?' + query.toString();
+
+        window.fetch(url, { signal: searchTerms.controller.signal })
           .then(function (response) {
             if (!response.ok) {
               throw new Error('Request failed');
@@ -57,76 +127,61 @@
             return response.json();
           })
           .then(function (data) {
-            if (!cancelled) {
-              setResults(Array.isArray(data) ? data : []);
-            }
+            var terms = Array.isArray(data) ? data : [];
+            var names = terms.map(function (term) {
+              return decodeEntities(term.name || term.slug);
+            });
+
+            addTermsToMap(terms);
+            setSuggestions(names);
+            setError(false);
           })
-          .catch(function () {
-            if (!cancelled) {
-              setResults([]);
+          .catch(function (requestError) {
+            if (requestError.name !== 'AbortError') {
+              setSuggestions([]);
               setError(true);
-            }
-          })
-          .then(function () {
-            if (!cancelled) {
-              setLoading(false);
             }
           });
       }, 300);
-
-      return function () {
-        cancelled = true;
-        window.clearTimeout(timer);
-      };
-    }, [search, props.action]);
-
-    function toggle(slug, checked) {
-      var next;
-      if (checked) {
-        next = selected.indexOf(slug) === -1 ? selected.concat([slug]) : selected;
-      } else {
-        next = selected.filter(function (item) { return item !== slug; });
-      }
-      props.onChange(next);
     }
+
+    function changeTokens(names) {
+      var slugs = names.map(function (name) {
+        var match = Object.keys(termsBySlug).find(function (slug) {
+          return termsBySlug[slug] === name;
+        });
+
+        if (match) {
+          return match;
+        }
+
+        // Preserve an existing saved slug while its display name is resolving.
+        return selected.indexOf(name) !== -1 ? name : null;
+      }).filter(function (slug) {
+        return slug !== null;
+      });
+
+      props.onChange(slugs);
+    }
+
+    var values = selected.map(function (slug) {
+      return termsBySlug[slug] || slug;
+    });
 
     return el(
       'div',
       { className: 'ucf-news-feed-taxonomy-control' },
-      el(SearchControl, {
+      el(FormTokenField, {
         label: props.label,
-        value: search,
-        onChange: setSearch,
-        placeholder: props.placeholder
+        value: values,
+        suggestions: suggestions,
+        onInputChange: searchTerms,
+        onChange: changeTokens
       }),
-      selected.length ? el(
-        'div',
-        { className: 'ucf-news-feed-selected-terms' },
-        el('p', { className: 'ucf-news-feed-selected-label' }, __('Selected:', 'ucf-news')),
-        selected.map(function (slug) {
-          return el(Button, {
-            key: slug,
-            variant: 'secondary',
-            isSmall: true,
-            onClick: function () { toggle(slug, false); },
-            className: 'ucf-news-feed-selected-term'
-          }, slug + ' ×');
-        })
-      ) : null,
-      loading ? el(Spinner) : null,
-      error ? el(Notice, { status: 'warning', isDismissible: false }, __('Options could not be loaded. Please try again.', 'ucf-news')) : null,
-      search.length > 0 && search.length < 2 ? el('p', { className: 'components-base-control__help' }, __('Enter at least two characters to search.', 'ucf-news')) : null,
-      results.length ? el(
-        'div',
-        { className: 'ucf-news-feed-taxonomy-results' },
-        results.map(function (term) {
-          return el(CheckboxControl, {
-            key: term.slug,
-            label: term.name || term.slug,
-            checked: selected.indexOf(term.slug) !== -1,
-            onChange: function (checked) { toggle(term.slug, checked); }
-          });
-        })
+      error ? el(
+        Notice,
+        { status: 'warning', isDismissible: false },
+        __('Options could not be loaded. Please try again.', 'ucf-news')
       ) : null
     );
   }
@@ -279,15 +334,13 @@
             { title: __('Story Filters', 'ucf-news'), initialOpen: true },
             el(TaxonomyControl, {
               label: __('Categories', 'ucf-news'),
-              placeholder: __('Search categories…', 'ucf-news'),
-              action: 'ucf-news-sections',
+              taxonomy: 'categories',
               value: attributes.sections,
               onChange: function (sections) { setAttributes({ sections: sections }); }
             }),
             el(TaxonomyControl, {
               label: __('Tags', 'ucf-news'),
-              placeholder: __('Search tags…', 'ucf-news'),
-              action: 'ucf-news-topics',
+              taxonomy: 'tags',
               value: attributes.topics,
               onChange: function (topics) { setAttributes({ topics: topics }); }
             })
@@ -333,5 +386,6 @@
   window.wp.blockEditor,
   window.wp.components,
   window.wp.element,
+  window.wp.htmlEntities,
   window.wp.i18n
 );

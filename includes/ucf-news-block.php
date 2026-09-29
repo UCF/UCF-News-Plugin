@@ -15,8 +15,7 @@ if ( ! class_exists( 'UCF_News_Block' ) ) {
 		public static function register() {
 			global $wp_version;
 
-			// Metadata-based block registration requires WordPress 5.8+, because
-			// register_block_type() only accepts a block.json path starting in 5.8.
+			// Metadata-based block registration is only enabled on WordPress 5.8+.
 			// Older sites keep all existing shortcode/widget functionality unchanged.
 			if ( ! function_exists( 'register_block_type' ) || version_compare( $wp_version, '5.8', '<' ) ) {
 				return;
@@ -29,23 +28,33 @@ if ( ! class_exists( 'UCF_News_Block' ) ) {
 			wp_register_script(
 				'ucf-news-feed-block-editor',
 				UCF_NEWS__PLUGIN_URL . '/blocks/ucf-news-feed/editor.js',
-				array( 'wp-api-fetch', 'wp-blocks', 'wp-block-editor', 'wp-components', 'wp-element', 'wp-i18n' ),
-				file_exists( $editor_script_path ) ? filemtime( $editor_script_path ) : '3.1.0',
+				array( 'wp-api-fetch', 'wp-blocks', 'wp-block-editor', 'wp-components', 'wp-element', 'wp-html-entities', 'wp-i18n' ),
+				file_exists( $editor_script_path ) ? filemtime( $editor_script_path ) : '4.0.0',
 				true
+			);
+
+			wp_add_inline_script(
+				'ucf-news-feed-block-editor',
+				'window.ucfNewsBlock = ' . wp_json_encode(
+					array(
+						'feedUrl' => trailingslashit( get_option( 'ucf_news_feed_url', UCF_News_Config::$default_plugin_options['ucf_news_feed_url'] ) ),
+					)
+				) . ';',
+				'before'
 			);
 
 			wp_register_style(
 				'ucf-news-feed-block',
 				UCF_NEWS__PLUGIN_URL . '/blocks/ucf-news-feed/style.css',
 				array(),
-				file_exists( $style_path ) ? filemtime( $style_path ) : '3.1.0'
+				file_exists( $style_path ) ? filemtime( $style_path ) : '4.0.0'
 			);
 
 			wp_register_style(
 				'ucf-news-feed-block-editor',
 				UCF_NEWS__PLUGIN_URL . '/blocks/ucf-news-feed/editor.css',
 				array( 'ucf-news-feed-block' ),
-				file_exists( $editor_style_path ) ? filemtime( $editor_style_path ) : '3.1.0'
+				file_exists( $editor_style_path ) ? filemtime( $editor_style_path ) : '4.0.0'
 			);
 
 			register_block_type(
