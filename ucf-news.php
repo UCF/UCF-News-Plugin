@@ -2,7 +2,7 @@
 /*
 Plugin Name: UCF News
 Description: Contains shortcode and widget for displaying UCF News Feeds
-Version: 3.0.2
+Version: 4.0.0
 Author: UCF Web Communications
 License: GPL3
 Github Plugin URI: UCF/UCF-News-Plugin
@@ -20,6 +20,7 @@ require_once UCF_NEWS__PLUGIN_DIR . 'includes/ucf-news-config.php';
 require_once UCF_NEWS__PLUGIN_DIR . 'includes/ucf-news-feed.php';
 require_once UCF_NEWS__PLUGIN_DIR . 'includes/ucf-news-common.php';
 require_once UCF_NEWS__PLUGIN_DIR . 'includes/ucf-news-shortcode.php';
+require_once UCF_NEWS__PLUGIN_DIR . 'includes/ucf-news-block.php';
 require_once UCF_NEWS__PLUGIN_DIR . 'includes/external-stories-shortcode.php';
 require_once UCF_NEWS__PLUGIN_DIR . 'includes/ucf-statements-shortcode.php';
 require_once UCF_NEWS__PLUGIN_DIR . 'includes/ucf-news-widget.php';
@@ -51,6 +52,8 @@ if ( ! function_exists( 'ucf_news_deactivate' ) ) {
 add_action( 'plugins_loaded', function() {
 
 	add_action( 'init', array( 'UCF_News_Shortcode', 'register_shortcode' ) );
+	add_action( 'init', array( 'UCF_News_Block', 'register' ) );
+	add_action( 'rest_api_init', array( 'UCF_News_Block', 'register_rest_routes' ) );
 	add_action( 'init', array( 'External_Stories_Shortcode', 'register_shortcode' ) );
 	add_action( 'init', array( 'UCF_Statements_Shortcode', 'register_shortcode' ) );
 	add_action( 'admin_menu', array( 'UCF_News_Config', 'add_options_page' ) );

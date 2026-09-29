@@ -1,0 +1,34 @@
+{
+  "apiVersion": 2,
+  "name": "ucf-news/news-feed",
+  "version": "4.0.0",
+  "title": "UCF News Feed",
+  "category": "widgets",
+  "icon": "megaphone",
+  "description": "Display the latest stories from UCF News.",
+  "textdomain": "ucf-news",
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "News"
+    },
+    "limit": {
+      "type": "number",
+      "default": 6
+    },
+    "sections": {
+      "type": "array",
+      "default": []
+    },
+    "topics": {
+      "type": "array",
+      "default": []
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "editorScript": "ucf-news-feed-block-editor",
+  "style": "ucf-news-feed-block",
+  "editorStyle": "ucf-news-feed-block-editor"
+}
