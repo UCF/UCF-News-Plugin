@@ -1,4 +1,4 @@
-(function (apiFetch, blocks, blockEditor, components, element, htmlEntities, i18n) {
+(function (blocks, blockEditor, components, element, htmlEntities, i18n, serverSideRender) {
   'use strict';
 
   var el = element.createElement;
@@ -10,13 +10,13 @@
   var PanelBody = components.PanelBody;
   var FormTokenField = components.FormTokenField;
   var RangeControl = components.RangeControl;
-  var Spinner = components.Spinner;
   var Notice = components.Notice;
   var decodeEntities = htmlEntities.decodeEntities;
   var __ = i18n.__;
+  var ServerSideRender = serverSideRender;
 
   // Editor control for searching and selecting categories or tags.
-  function TaxonomyControl(props) {
+  function TaxonomyTokenField(props) {
     var selected = props.value || [];
     var stateTerms = useState({});
     var termsBySlug = stateTerms[0];
@@ -186,135 +186,7 @@
     );
   }
 
-  // Loads and renders the story preview shown inside the block editor.
-  function StoryPreview(props) {
-    var attributes = props.attributes;
-    var stateStories = useState([]);
-    var stories = stateStories[0];
-    var setStories = stateStories[1];
-    var stateLoading = useState(true);
-    var loading = stateLoading[0];
-    var setLoading = stateLoading[1];
-    var stateError = useState(false);
-    var error = stateError[0];
-    var setError = stateError[1];
-
-    useEffect(function () {
-      var cancelled = false;
-      var query = new window.URLSearchParams();
-      query.set('limit', attributes.limit || 6);
-
-      if (attributes.sections && attributes.sections.length) {
-        query.set('sections', attributes.sections.join(','));
-      }
-      if (attributes.topics && attributes.topics.length) {
-        query.set('topics', attributes.topics.join(','));
-      }
-
-      setLoading(true);
-      setError(false);
-
-      apiFetch({ path: '/ucf-news/v1/stories?' + query.toString() })
-        .then(function (data) {
-          if (!cancelled) {
-            setStories(Array.isArray(data) ? data : []);
-          }
-        })
-        .catch(function () {
-          if (!cancelled) {
-            setStories([]);
-            setError(true);
-          }
-        })
-        .then(function () {
-          if (!cancelled) {
-            setLoading(false);
-          }
-        });
-
-      return function () {
-        cancelled = true;
-      };
-    }, [attributes.limit, (attributes.sections || []).join(','), (attributes.topics || []).join(',')]);
-
-    if (loading) {
-      return el(
-        'div',
-        { className: 'ucf-news-feed-editor-status' },
-        el(Spinner),
-        ' ',
-        __('Loading UCF News stories…', 'ucf-news')
-      );
-    }
-
-    if (error) {
-      return el(
-        Notice,
-        { status: 'warning', isDismissible: false },
-        __('UCF News stories could not be loaded. Please try again.', 'ucf-news')
-      );
-    }
-
-    if (!stories.length) {
-      return el('p', { className: 'ucf-news-feed-editor-status' }, __('No UCF News stories were found.', 'ucf-news'));
-    }
-
-    var className = attributes.className || '';
-    var style = 'classic';
-
-    if (className.indexOf('is-style-modern') !== -1) {
-      style = 'modern';
-    } else if (className.indexOf('is-style-card') !== -1) {
-      style = 'card';
-    }
-
-    return el(
-      Fragment,
-      null,
-      attributes.title ? el('h2', { className: 'ucf-news-feed-title' }, attributes.title) : null,
-      el(
-        'ul',
-        { className: 'ucf-news-feed-list' },
-        stories.map(function (story, index) {
-          var itemClass = story.image ? 'ucf-news-feed-item' : 'ucf-news-feed-item ucf-news-feed-item--no-image';
-          return el(
-            'li',
-            { className: itemClass, key: story.id || story.link || index },
-            story.image ? el(
-              'figure',
-              { className: 'ucf-news-feed-thumbnail' },
-              el('img', {
-                src: story.image,
-                alt: '',
-                width: story.width || undefined,
-                height: story.height || undefined
-              })
-            ) : null,
-            el(
-              'div',
-              { className: 'ucf-news-feed-item-content' },
-              style === 'modern' && story.section ? el('div', { className: 'ucf-news-feed-section' }, story.section) : null,
-              story.link ? el(
-                'a',
-                {
-                  className: 'ucf-news-feed-story-title',
-                  href: story.link,
-                  onClick: function (event) { event.preventDefault(); }
-                },
-                story.title
-              ) : el(
-                'span',
-                { className: 'ucf-news-feed-story-title' },
-                story.title
-              ),
-              style === 'modern' && story.excerpt ? el('div', { className: 'ucf-news-feed-excerpt' }, story.excerpt) : null,
-              style === 'card' && story.date ? el('div', { className: 'ucf-news-feed-date' }, story.date) : null
-            )
-          );
-        })
-      )
-    );
-  }
+  // Story markup is rendered by PHP so the editor and frontend share one layout source.
 
   // Register the dynamic UCF News Feed block.
   blocks.registerBlockType('ucf-news/news-feed', {
@@ -332,13 +204,13 @@
           el(
             PanelBody,
             { title: __('Story Filters', 'ucf-news'), initialOpen: true },
-            el(TaxonomyControl, {
+            el(TaxonomyTokenField, {
               label: __('Categories', 'ucf-news'),
               taxonomy: 'categories',
               value: attributes.sections,
               onChange: function (sections) { setAttributes({ sections: sections }); }
             }),
-            el(TaxonomyControl, {
+            el(TaxonomyTokenField, {
               label: __('Tags', 'ucf-news'),
               taxonomy: 'tags',
               value: attributes.topics,
@@ -357,7 +229,14 @@
             })
           )
         ),
-        el('div', blockProps, el(StoryPreview, { attributes: attributes }))
+        el(
+          'div',
+          blockProps,
+          el(ServerSideRender, {
+            block: 'ucf-news/news-feed',
+            attributes: attributes
+          })
+        )
       );
     },
     save: function () {
@@ -381,11 +260,11 @@
   });
 
 })(
-  window.wp.apiFetch,
   window.wp.blocks,
   window.wp.blockEditor,
   window.wp.components,
   window.wp.element,
   window.wp.htmlEntities,
-  window.wp.i18n
+  window.wp.i18n,
+  window.wp.serverSideRender
 );
