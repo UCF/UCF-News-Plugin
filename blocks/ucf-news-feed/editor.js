@@ -4,6 +4,7 @@
   var el = element.createElement;
   var Fragment = element.Fragment;
   var useEffect = element.useEffect;
+  var useRef = element.useRef;
   var useState = element.useState;
   var InspectorControls = blockEditor.InspectorControls;
   var useBlockProps = blockEditor.useBlockProps;
@@ -28,6 +29,8 @@
     var stateError = useState(false);
     var error = stateError[0];
     var setError = stateError[1];
+    var searchTimer = useRef(null);
+    var searchController = useRef(null);
     var feedUrl = window.ucfNewsBlock && window.ucfNewsBlock.feedUrl
       ? window.ucfNewsBlock.feedUrl
       : '';
@@ -85,15 +88,26 @@
       };
     }, [feedUrl, props.taxonomy, selected.join(',')]);
 
-    function searchTerms(input) {
-      var controller = searchTerms.controller;
-      var timer = searchTerms.timer;
+    // Cancel pending searches when this control is removed from the editor.
+    useEffect(function () {
+      return function () {
+        if (searchTimer.current !== null) {
+          window.clearTimeout(searchTimer.current);
+        }
+        if (searchController.current) {
+          searchController.current.abort();
+        }
+      };
+    }, []);
 
-      if (controller) {
-        controller.abort();
+    function searchTerms(input) {
+      if (searchController.current) {
+        searchController.current.abort();
+        searchController.current = null;
       }
-      if (timer) {
-        window.clearTimeout(timer);
+      if (searchTimer.current !== null) {
+        window.clearTimeout(searchTimer.current);
+        searchTimer.current = null;
       }
 
       if (!input) {
@@ -108,11 +122,13 @@
         return;
       }
 
-      searchTerms.timer = window.setTimeout(function () {
+      searchTimer.current = window.setTimeout(function () {
+        searchTimer.current = null;
         var query = new window.URLSearchParams();
         var url;
 
-        searchTerms.controller = new window.AbortController();
+        var controller = new window.AbortController();
+        searchController.current = controller;
         query.set('search', input);
         query.set('per_page', '20');
         query.set('orderby', 'count');
@@ -120,7 +136,7 @@
         query.set('_fields', 'slug,name');
         url = feedUrl + props.taxonomy + '?' + query.toString();
 
-        window.fetch(url, { signal: searchTerms.controller.signal })
+        window.fetch(url, { signal: controller.signal })
           .then(function (response) {
             if (!response.ok) {
               throw new Error('Request failed');
@@ -128,6 +144,9 @@
             return response.json();
           })
           .then(function (data) {
+            if (controller.signal.aborted) {
+              return;
+            }
             var terms = Array.isArray(data) ? data : [];
             var names = terms.map(function (term) {
               return decodeEntities(term.name || term.slug);
@@ -138,7 +157,7 @@
             setError(false);
           })
           .catch(function (requestError) {
-            if (requestError.name !== 'AbortError') {
+            if (requestError.name !== 'AbortError' && !controller.signal.aborted) {
               setSuggestions([]);
               setError(true);
             }
