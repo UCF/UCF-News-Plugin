@@ -9,6 +9,7 @@
   var useBlockProps = blockEditor.useBlockProps;
   var PanelBody = components.PanelBody;
   var FormTokenField = components.FormTokenField;
+  var Disabled = components.Disabled;
   var RangeControl = components.RangeControl;
   var Notice = components.Notice;
   var decodeEntities = htmlEntities.decodeEntities;
@@ -232,10 +233,14 @@
         el(
           'div',
           blockProps,
-          el(ServerSideRender, {
-            block: 'ucf-news/news-feed',
-            attributes: attributes
-          })
+          el(
+            Disabled,
+            null,
+            el(ServerSideRender, {
+              block: 'ucf-news/news-feed',
+              attributes: attributes
+            })
+          )
         )
       );
     },
