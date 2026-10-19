@@ -6,9 +6,12 @@
 if ( ! class_exists( 'UCF_News_Admin_API' ) ) {
 	class UCF_News_Admin_API {
 		public static function ajax_get_sections() {
-			$results = UCF_News_Feed::get_sections( $_GET['q'] );
-			foreach( $results as $result ) {
-				echo $result->slug . "\n";
+			$search  = isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '';
+			$results = UCF_News_Feed::get_sections( $search );
+			if ( is_array( $results ) ) {
+				foreach ( $results as $result ) {
+					echo esc_html( $result->slug ) . "\n";
+				}
 			}
 			die();
 		}
