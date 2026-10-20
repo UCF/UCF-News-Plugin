@@ -5,23 +5,3 @@
 .ucf-news-feed-taxonomy-control + .ucf-news-feed-taxonomy-control {
     margin-top: 24px;
 }
-
-.ucf-news-feed-selected-terms {
-    margin: 8px 0 12px;
-}
-
-.ucf-news-feed-selected-label {
-    margin: 0 0 6px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.ucf-news-feed-selected-term {
-    margin: 0 6px 6px 0;
-}
-
-.ucf-news-feed-taxonomy-results {
-    max-height: 220px;
-    overflow-y: auto;
-    padding-top: 8px;
-}

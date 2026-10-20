@@ -1,55 +1,142 @@
-(function (apiFetch, blocks, blockEditor, components, element, i18n) {
+(function (blocks, blockEditor, components, element, htmlEntities, i18n, serverSideRender) {
   'use strict';
 
   var el = element.createElement;
   var Fragment = element.Fragment;
   var useEffect = element.useEffect;
+  var useRef = element.useRef;
   var useState = element.useState;
   var InspectorControls = blockEditor.InspectorControls;
   var useBlockProps = blockEditor.useBlockProps;
   var PanelBody = components.PanelBody;
-  var SearchControl = components.SearchControl;
-  var CheckboxControl = components.CheckboxControl;
-  var Button = components.Button;
+  var FormTokenField = components.FormTokenField;
+  var Disabled = components.Disabled;
   var RangeControl = components.RangeControl;
-  var Spinner = components.Spinner;
   var Notice = components.Notice;
+  var decodeEntities = htmlEntities.decodeEntities;
   var __ = i18n.__;
+  var ServerSideRender = serverSideRender;
 
   // Editor control for searching and selecting categories or tags.
-  function TaxonomyControl(props) {
+  function TaxonomyTokenField(props) {
     var selected = props.value || [];
-    var stateSearch = useState('');
-    var search = stateSearch[0];
-    var setSearch = stateSearch[1];
-    var stateResults = useState([]);
-    var results = stateResults[0];
-    var setResults = stateResults[1];
-    var stateLoading = useState(false);
-    var loading = stateLoading[0];
-    var setLoading = stateLoading[1];
+    var stateTerms = useState({});
+    var termsBySlug = stateTerms[0];
+    var setTermsBySlug = stateTerms[1];
+    var stateSuggestions = useState([]);
+    var suggestions = stateSuggestions[0];
+    var setSuggestions = stateSuggestions[1];
     var stateError = useState(false);
     var error = stateError[0];
     var setError = stateError[1];
+    var searchTimer = useRef(null);
+    var searchController = useRef(null);
+    var feedUrl = window.ucfNewsBlock && window.ucfNewsBlock.feedUrl
+      ? window.ucfNewsBlock.feedUrl
+      : '';
 
+    function addTermsToMap(terms) {
+      setTermsBySlug(function (current) {
+        var next = Object.assign({}, current);
+
+        terms.forEach(function (term) {
+          if (term && term.slug) {
+            next[term.slug] = decodeEntities(term.name || term.slug);
+          }
+        });
+
+        return next;
+      });
+    }
+
+    // Resolve saved slugs so existing blocks display human-readable token names.
     useEffect(function () {
-      var cancelled = false;
-      var timer;
+      var controller;
+      var query;
+      var url;
 
-      if (search.length < 2) {
-        setResults([]);
-        setError(false);
+      if (!feedUrl || !selected.length) {
         return function () {};
       }
 
-      timer = window.setTimeout(function () {
-        var url = window.ajaxurl
-          + '?action=' + encodeURIComponent(props.action)
-          + '&format=json&q=' + encodeURIComponent(search);
-        setLoading(true);
-        setError(false);
+      controller = new window.AbortController();
+      query = new window.URLSearchParams();
+      query.set('slug', selected.join(','));
+      query.set('per_page', '100');
+      query.set('_fields', 'slug,name');
+      url = feedUrl + props.taxonomy + '?' + query.toString();
 
-        window.fetch(url, { credentials: 'same-origin' })
+      window.fetch(url, { signal: controller.signal })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Request failed');
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          addTermsToMap(Array.isArray(data) ? data : []);
+          setError(false);
+        })
+        .catch(function (requestError) {
+          if (requestError.name !== 'AbortError') {
+            setError(true);
+          }
+        });
+
+      return function () {
+        controller.abort();
+      };
+    }, [feedUrl, props.taxonomy, selected.join(',')]);
+
+    // Cancel pending searches when this control is removed from the editor.
+    useEffect(function () {
+      return function () {
+        if (searchTimer.current !== null) {
+          window.clearTimeout(searchTimer.current);
+        }
+        if (searchController.current) {
+          searchController.current.abort();
+        }
+      };
+    }, []);
+
+    function searchTerms(input) {
+      if (searchController.current) {
+        searchController.current.abort();
+        searchController.current = null;
+      }
+      if (searchTimer.current !== null) {
+        window.clearTimeout(searchTimer.current);
+        searchTimer.current = null;
+      }
+
+      if (!input) {
+        setSuggestions([]);
+        setError(false);
+        return;
+      }
+
+      if (!feedUrl) {
+        setSuggestions([]);
+        setError(true);
+        return;
+      }
+
+      searchTimer.current = window.setTimeout(function () {
+        searchTimer.current = null;
+        var query = new window.URLSearchParams();
+        var url;
+
+        var controller = new window.AbortController();
+        searchController.current = controller;
+        query.set('search', input);
+        query.set('per_page', '20');
+        query.set('orderby', 'count');
+        query.set('order', 'desc');
+        query.set('_fields', 'slug,name');
+        url = feedUrl + props.taxonomy + '?' + query.toString();
+
+        window.fetch(url, { signal: controller.signal })
           .then(function (response) {
             if (!response.ok) {
               throw new Error('Request failed');
@@ -57,209 +144,69 @@
             return response.json();
           })
           .then(function (data) {
-            if (!cancelled) {
-              setResults(Array.isArray(data) ? data : []);
+            if (controller.signal.aborted) {
+              return;
             }
+            var terms = Array.isArray(data) ? data : [];
+            var names = terms.map(function (term) {
+              return decodeEntities(term.name || term.slug);
+            });
+
+            addTermsToMap(terms);
+            setSuggestions(names);
+            setError(false);
           })
-          .catch(function () {
-            if (!cancelled) {
-              setResults([]);
+          .catch(function (requestError) {
+            if (requestError.name !== 'AbortError' && !controller.signal.aborted) {
+              setSuggestions([]);
               setError(true);
-            }
-          })
-          .then(function () {
-            if (!cancelled) {
-              setLoading(false);
             }
           });
       }, 300);
-
-      return function () {
-        cancelled = true;
-        window.clearTimeout(timer);
-      };
-    }, [search, props.action]);
-
-    function toggle(slug, checked) {
-      var next;
-      if (checked) {
-        next = selected.indexOf(slug) === -1 ? selected.concat([slug]) : selected;
-      } else {
-        next = selected.filter(function (item) { return item !== slug; });
-      }
-      props.onChange(next);
     }
+
+    function changeTokens(names) {
+      var slugs = names.map(function (name) {
+        var match = Object.keys(termsBySlug).find(function (slug) {
+          return termsBySlug[slug] === name;
+        });
+
+        if (match) {
+          return match;
+        }
+
+        // Preserve an existing saved slug while its display name is resolving.
+        return selected.indexOf(name) !== -1 ? name : null;
+      }).filter(function (slug) {
+        return slug !== null;
+      });
+
+      props.onChange(slugs);
+    }
+
+    var values = selected.map(function (slug) {
+      return termsBySlug[slug] || slug;
+    });
 
     return el(
       'div',
       { className: 'ucf-news-feed-taxonomy-control' },
-      el(SearchControl, {
+      el(FormTokenField, {
         label: props.label,
-        value: search,
-        onChange: setSearch,
-        placeholder: props.placeholder
+        value: values,
+        suggestions: suggestions,
+        onInputChange: searchTerms,
+        onChange: changeTokens
       }),
-      selected.length ? el(
-        'div',
-        { className: 'ucf-news-feed-selected-terms' },
-        el('p', { className: 'ucf-news-feed-selected-label' }, __('Selected:', 'ucf-news')),
-        selected.map(function (slug) {
-          return el(Button, {
-            key: slug,
-            variant: 'secondary',
-            isSmall: true,
-            onClick: function () { toggle(slug, false); },
-            className: 'ucf-news-feed-selected-term'
-          }, slug + ' ×');
-        })
-      ) : null,
-      loading ? el(Spinner) : null,
-      error ? el(Notice, { status: 'warning', isDismissible: false }, __('Options could not be loaded. Please try again.', 'ucf-news')) : null,
-      search.length > 0 && search.length < 2 ? el('p', { className: 'components-base-control__help' }, __('Enter at least two characters to search.', 'ucf-news')) : null,
-      results.length ? el(
-        'div',
-        { className: 'ucf-news-feed-taxonomy-results' },
-        results.map(function (term) {
-          return el(CheckboxControl, {
-            key: term.slug,
-            label: term.name || term.slug,
-            checked: selected.indexOf(term.slug) !== -1,
-            onChange: function (checked) { toggle(term.slug, checked); }
-          });
-        })
+      error ? el(
+        Notice,
+        { status: 'warning', isDismissible: false },
+        __('Options could not be loaded. Please try again.', 'ucf-news')
       ) : null
     );
   }
 
-  // Loads and renders the story preview shown inside the block editor.
-  function StoryPreview(props) {
-    var attributes = props.attributes;
-    var stateStories = useState([]);
-    var stories = stateStories[0];
-    var setStories = stateStories[1];
-    var stateLoading = useState(true);
-    var loading = stateLoading[0];
-    var setLoading = stateLoading[1];
-    var stateError = useState(false);
-    var error = stateError[0];
-    var setError = stateError[1];
-
-    useEffect(function () {
-      var cancelled = false;
-      var query = new window.URLSearchParams();
-      query.set('limit', attributes.limit || 6);
-
-      if (attributes.sections && attributes.sections.length) {
-        query.set('sections', attributes.sections.join(','));
-      }
-      if (attributes.topics && attributes.topics.length) {
-        query.set('topics', attributes.topics.join(','));
-      }
-
-      setLoading(true);
-      setError(false);
-
-      apiFetch({ path: '/ucf-news/v1/stories?' + query.toString() })
-        .then(function (data) {
-          if (!cancelled) {
-            setStories(Array.isArray(data) ? data : []);
-          }
-        })
-        .catch(function () {
-          if (!cancelled) {
-            setStories([]);
-            setError(true);
-          }
-        })
-        .then(function () {
-          if (!cancelled) {
-            setLoading(false);
-          }
-        });
-
-      return function () {
-        cancelled = true;
-      };
-    }, [attributes.limit, (attributes.sections || []).join(','), (attributes.topics || []).join(',')]);
-
-    if (loading) {
-      return el(
-        'div',
-        { className: 'ucf-news-feed-editor-status' },
-        el(Spinner),
-        ' ',
-        __('Loading UCF News stories…', 'ucf-news')
-      );
-    }
-
-    if (error) {
-      return el(
-        Notice,
-        { status: 'warning', isDismissible: false },
-        __('UCF News stories could not be loaded. Please try again.', 'ucf-news')
-      );
-    }
-
-    if (!stories.length) {
-      return el('p', { className: 'ucf-news-feed-editor-status' }, __('No UCF News stories were found.', 'ucf-news'));
-    }
-
-    var className = attributes.className || '';
-    var style = 'classic';
-
-    if (className.indexOf('is-style-modern') !== -1) {
-      style = 'modern';
-    } else if (className.indexOf('is-style-card') !== -1) {
-      style = 'card';
-    }
-
-    return el(
-      Fragment,
-      null,
-      attributes.title ? el('h2', { className: 'ucf-news-feed-title' }, attributes.title) : null,
-      el(
-        'ul',
-        { className: 'ucf-news-feed-list' },
-        stories.map(function (story, index) {
-          var itemClass = story.image ? 'ucf-news-feed-item' : 'ucf-news-feed-item ucf-news-feed-item--no-image';
-          return el(
-            'li',
-            { className: itemClass, key: story.id || story.link || index },
-            story.image ? el(
-              'figure',
-              { className: 'ucf-news-feed-thumbnail' },
-              el('img', {
-                src: story.image,
-                alt: '',
-                width: story.width || undefined,
-                height: story.height || undefined
-              })
-            ) : null,
-            el(
-              'div',
-              { className: 'ucf-news-feed-item-content' },
-              style === 'modern' && story.section ? el('div', { className: 'ucf-news-feed-section' }, story.section) : null,
-              story.link ? el(
-                'a',
-                {
-                  className: 'ucf-news-feed-story-title',
-                  href: story.link,
-                  onClick: function (event) { event.preventDefault(); }
-                },
-                story.title
-              ) : el(
-                'span',
-                { className: 'ucf-news-feed-story-title' },
-                story.title
-              ),
-              style === 'modern' && story.excerpt ? el('div', { className: 'ucf-news-feed-excerpt' }, story.excerpt) : null,
-              style === 'card' && story.date ? el('div', { className: 'ucf-news-feed-date' }, story.date) : null
-            )
-          );
-        })
-      )
-    );
-  }
+  // Story markup is rendered by PHP so the editor and frontend share one layout source.
 
   // Register the dynamic UCF News Feed block.
   blocks.registerBlockType('ucf-news/news-feed', {
@@ -277,17 +224,15 @@
           el(
             PanelBody,
             { title: __('Story Filters', 'ucf-news'), initialOpen: true },
-            el(TaxonomyControl, {
+            el(TaxonomyTokenField, {
               label: __('Categories', 'ucf-news'),
-              placeholder: __('Search categories…', 'ucf-news'),
-              action: 'ucf-news-sections',
+              taxonomy: 'categories',
               value: attributes.sections,
               onChange: function (sections) { setAttributes({ sections: sections }); }
             }),
-            el(TaxonomyControl, {
+            el(TaxonomyTokenField, {
               label: __('Tags', 'ucf-news'),
-              placeholder: __('Search tags…', 'ucf-news'),
-              action: 'ucf-news-topics',
+              taxonomy: 'tags',
               value: attributes.topics,
               onChange: function (topics) { setAttributes({ topics: topics }); }
             })
@@ -304,7 +249,18 @@
             })
           )
         ),
-        el('div', blockProps, el(StoryPreview, { attributes: attributes }))
+        el(
+          'div',
+          blockProps,
+          el(
+            Disabled,
+            null,
+            el(ServerSideRender, {
+              block: 'ucf-news/news-feed',
+              attributes: attributes
+            })
+          )
+        )
       );
     },
     save: function () {
@@ -328,10 +284,11 @@
   });
 
 })(
-  window.wp.apiFetch,
   window.wp.blocks,
   window.wp.blockEditor,
   window.wp.components,
   window.wp.element,
-  window.wp.i18n
+  window.wp.htmlEntities,
+  window.wp.i18n,
+  window.wp.serverSideRender
 );

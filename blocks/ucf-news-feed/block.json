@@ -18,11 +18,17 @@
     },
     "sections": {
       "type": "array",
-      "default": []
+      "default": [],
+      "items": {
+        "type": "string"
+      }
     },
     "topics": {
       "type": "array",
-      "default": []
+      "default": [],
+      "items": {
+        "type": "string"
+      }
     }
   },
   "supports": {
