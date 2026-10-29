@@ -12,6 +12,7 @@
   var CheckboxControl = components.CheckboxControl;
   var Button = components.Button;
   var RangeControl = components.RangeControl;
+  var TextControl = components.TextControl;
   var Spinner = components.Spinner;
   var Notice = components.Notice;
   var __ = i18n.__;
@@ -148,6 +149,7 @@
       var cancelled = false;
       var query = new window.URLSearchParams();
       query.set('limit', attributes.limit || 6);
+      query.set('offset', attributes.offset || 0);
 
       if (attributes.sections && attributes.sections.length) {
         query.set('sections', attributes.sections.join(','));
@@ -180,7 +182,7 @@
       return function () {
         cancelled = true;
       };
-    }, [attributes.limit, (attributes.sections || []).join(','), (attributes.topics || []).join(',')]);
+    }, [attributes.limit, attributes.offset, (attributes.sections || []).join(','), (attributes.topics || []).join(',')]);
 
     if (loading) {
       return el(
@@ -301,6 +303,14 @@
               onChange: function (limit) { setAttributes({ limit: limit || 6 }); },
               min: 1,
               max: 24
+            }),
+            el(RangeControl, {
+              label: __('Skip Stories (Offset)', 'ucf-news'),
+              help: __('0 starts with the newest story; 1 skips the newest story.', 'ucf-news'),
+              value: attributes.offset || 0,
+              onChange: function (offset) { setAttributes({ offset: offset || 0 }); },
+              min: 0,
+              max: 50
             })
           )
         ),

@@ -2,10 +2,10 @@
 Contributors: ucfwebcom
 Requires at least: 5.3
 Tested up to: 6.1
-Stable tag: 4.0.0
+Stable tag: 4.0.1
 Requires PHP: 7.0
-License: GPLv3 or later
-License URI: http://www.gnu.org/copyleft/gpl-3.0.html
+License: GPL-3.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Provides a shortcode, widget, and functions for displaying UCF news.
 
@@ -21,6 +21,17 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 
 == Changelog ==
+
+= 4.0.1 =
+Enhancements:
+* Added a story offset slider to the Gutenberg News Feed block, allowing editors to skip stories and display consecutive stories across multiple blocks without duplication.
+* Added the Update URI header for UCF Plugin Directory and Packagist update identification.
+* Added the GNU GPL v3 license file and standardized GPL-3.0-or-later metadata.
+
+= 4.0.0 =
+Enhancements:
+* Added a Gutenberg UCF News Feed block with category/tag filtering, story count controls, and Classic, Modern, and Card styles.
+* Preserved existing shortcodes and widgets.
 
 = 3.0.2 =
 Enhancements:

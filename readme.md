@@ -15,6 +15,17 @@ Head over to the [UCF News Plugin wiki](https://github.com/UCF/UCF-News-Plugin/w
 
 ## Changelog ##
 
+### 4.0.1 ###
+Enhancements:
+* Added a story offset slider to the Gutenberg News Feed block, allowing editors to skip stories and display consecutive stories across multiple blocks without duplication.
+* Added the Update URI header for UCF Plugin Directory and Packagist update identification.
+* Added the GNU GPL v3 license file and standardized GPL-3.0-or-later metadata.
+
+### 4.0.0 ###
+Enhancements:
+* Added a Gutenberg UCF News Feed block with category/tag filtering, story count controls, and Classic, Modern, and Card styles.
+* Preserved existing shortcodes and widgets.
+
 ### 3.0.2 ###
 Enhancements:
 * Added composer file.

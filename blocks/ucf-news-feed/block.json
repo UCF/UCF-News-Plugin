@@ -1,7 +1,7 @@
 {
   "apiVersion": 2,
   "name": "ucf-news/news-feed",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "title": "UCF News Feed",
   "category": "widgets",
   "icon": "megaphone",
@@ -15,6 +15,10 @@
     "limit": {
       "type": "number",
       "default": 6
+    },
+    "offset": {
+      "type": "number",
+      "default": 0
     },
     "sections": {
       "type": "array",

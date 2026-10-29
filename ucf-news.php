@@ -2,9 +2,11 @@
 /*
 Plugin Name: UCF News
 Description: Contains shortcode and widget for displaying UCF News Feeds
-Version: 4.0.0
+Version: 4.0.1
 Author: UCF Web Communications
-License: GPL3
+License: GPL-3.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
+Update URI: https://packagist.org/packages/ucf/ucf-news-plugin
 Github Plugin URI: UCF/UCF-News-Plugin
 */
 if ( ! defined( 'WPINC' ) ) {

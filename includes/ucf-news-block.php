@@ -84,6 +84,13 @@ if ( ! class_exists( 'UCF_News_Block' ) ) {
 								return $value >= 1 && $value <= 24;
 							},
 						),
+						'offset' => array(
+							'default'           => 0,
+							'sanitize_callback' => 'absint',
+							'validate_callback' => function( $value ) {
+								return is_numeric( $value ) && (int) $value >= 0;
+							},
+						),
 						'sections' => array(
 							'default'           => '',
 							'sanitize_callback' => 'sanitize_text_field',
@@ -133,6 +140,7 @@ if ( ! class_exists( 'UCF_News_Block' ) ) {
 		 */
 		public static function rest_get_stories( $request ) {
 			$limit    = absint( $request->get_param( 'limit' ) );
+			$offset   = absint( $request->get_param( 'offset' ) );
 			$sections = $request->get_param( 'sections' );
 			$topics   = $request->get_param( 'topics' );
 
@@ -140,7 +148,7 @@ if ( ! class_exists( 'UCF_News_Block' ) ) {
 				array(
 					'sections' => $sections,
 					'topics'   => $topics,
-					'offset'   => 0,
+					'offset'   => $offset,
 					'limit'    => $limit ?: 6,
 				)
 			);
@@ -175,7 +183,7 @@ if ( ! class_exists( 'UCF_News_Block' ) ) {
 			$args = array(
 				'sections' => isset( $attributes['sections'] ) ? $attributes['sections'] : null,
 				'topics'   => isset( $attributes['topics'] ) ? $attributes['topics'] : null,
-				'offset'   => 0,
+				'offset'   => isset( $attributes['offset'] ) ? absint( $attributes['offset'] ) : 0,
 				'limit'    => $limit,
 			);
 
